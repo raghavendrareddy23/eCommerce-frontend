@@ -175,17 +175,20 @@ const CategoryUpdate = () => {
                   type="text"
                   ref={categoryNameRef} // Assign ref to input
                   placeholder="Category Name"
+                  required
                   className="mb-4 p-2 border border-gray-300 rounded"
                 />
                 <input
                   type="text"
                   ref={categoryStatusRef} // Assign ref to input
                   placeholder="Category Status"
+                  required
                   className="mb-4 p-2 border border-gray-300 rounded"
                 />
                 <div className="mt-4 flex justify-end">
                   <button
                     type="button"
+                    
                     className="mr-2 bg-blue-500 text-white py-1 px-3 rounded"
                     onClick={() => setShowUpdateModal(false)}
                   >

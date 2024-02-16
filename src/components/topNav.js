@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "./NavBar";
+import { LoginButton, LogoutButton } from "./admin/reuse";
 
 export default function TopNav() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!sessionStorage.getItem("adminToken")
+  );
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
+  // const handleLogin = () => {
+  //   setIsLoggedIn(true);
+  // };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -33,20 +37,9 @@ export default function TopNav() {
           <ul className="flex list-none">
             <li className="pl-5">
               {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="text-white hover:opacity-75 uppercase font-bold leading-snug"
-                >
-                  Logout
-                </button>
+                <LogoutButton onLogout={handleLogout} />
               ) : (
-                <Link
-                  to="/admin/login"
-                  onClick={handleLogin}
-                  className="text-white hover:opacity-75 uppercase font-bold leading-snug"
-                >
-                  Admin Login
-                </Link>
+                <LoginButton />
               )}
             </li>
           </ul>

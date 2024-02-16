@@ -175,18 +175,21 @@ const SubCategoryUpdate = () => {
                 <input
                   type="text"
                   placeholder="Subcategory Name"
+                  required
                   ref={subCategoryNameRef}
                   className="mb-4 p-2 border border-gray-300 rounded"
                 />
                 <input
                   type="text"
                   placeholder="Subcategory Status"
+                  required
                   ref={subCategoryStatusRef}
                   className="mb-4 p-2 border border-gray-300 rounded"
                 />
                 <input
                   type="text"
                   placeholder="Category Name"
+                  required
                   ref={categoryNameRef}
                   className="mb-4 p-2 border border-gray-300 rounded"
                 />

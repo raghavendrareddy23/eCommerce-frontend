@@ -258,6 +258,7 @@ const ProductUpdate = () => {
                   placeholder="SubCategory Name"
                   className="mb-4 p-2 border border-gray-300 rounded"
                   ref={subCategoryNameRef}
+                  required
                   defaultValue={selectedProduct.subCategoryName}
                   name="subCategoryName"
                 />
