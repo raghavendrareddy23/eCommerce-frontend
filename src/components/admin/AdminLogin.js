@@ -32,7 +32,9 @@ const AdminLogin = () => {
         sessionStorage.setItem('adminToken', data.token);
         sessionStorage.setItem('adminUsername', JSON.stringify(data.username));
         toast.success('Admin logged in successfully!'); // Display success toast
+        // window.location.reload();
         navigate("/");
+        window.location.reload();
       } else {
         const data = await response.json();
         toast.error(data.message || 'Failed to login admin'); // Display error toast
