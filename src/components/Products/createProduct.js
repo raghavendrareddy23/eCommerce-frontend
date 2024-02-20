@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios"; // Import Axios
 
 const CreateProduct = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,31 @@ const CreateProduct = () => {
     stock: "",
     images: [],
   });
+
+  const [subCategories, setSubCategories] = useState([]);
+
+  useEffect(() => {
+    fetchSubcategories();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchSubcategories = async () => {
+    try {
+      const response = await axios.get(
+        "https://ecommerce-backend-fm0r.onrender.com/product/"
+      );
+      const data = response.data;
+      const uniqueSubCategories = [
+        ...new Set(
+          data.data.map((product) => product.subCategoryId.subCategoryName)
+        ),
+      ];
+      setSubCategories(uniqueSubCategories);
+      console.log(subCategories);
+    } catch (error) {
+      console.error("Error fetching subcategories:", error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,34 +54,34 @@ const CreateProduct = () => {
     const token = sessionStorage.getItem("adminToken");
 
     try {
-      const response = await fetch(
+      const formData = new FormData(e.target); // Create FormData object
+
+      const response = await axios.post(
         "https://ecommerce-backend-fm0r.onrender.com/product/uploadImage",
+        formData,
         {
-          method: "POST",
-          body: new FormData(e.target),
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data", // Set content type to multipart/form-data
           },
         }
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create product");
+      if (response.status === 200) {
+        toast.success("Product created successfully");
+        // Reset form after successful submission
+        setFormData({
+          subCategoryName: "",
+          productName: "",
+          productDescription: "",
+          price: "",
+          sellPrice: "",
+          stock: "",
+          images: [],
+        });
+      } else {
+        throw new Error(response.data.message || "Failed to create product");
       }
-
-      toast.success("Product created successfully");
-      // Reset form after successful submission
-      setFormData({
-        subCategoryName: "",
-        productName: "",
-        productDescription: "",
-        price: "",
-        sellPrice: "",
-        stock: "",
-        images: [],
-      });
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Failed to create product");
@@ -66,15 +92,21 @@ const CreateProduct = () => {
     <div className="max-w-lg mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-4">Create New Product</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="subCategoryName"
+        <select
+          id="subcategory"
           value={formData.subCategoryName}
           onChange={handleInputChange}
-          placeholder="Subcategory Name"
           className="mb-4 p-2 border border-gray-300 rounded w-full"
+          name="subCategoryName"
           required
-        />
+        >
+          <option value="">Select Subcategory</option>
+          {subCategories.map((subcategory, index) => (
+            <option key={index} value={subcategory}>
+              {subcategory}
+            </option>
+          ))}
+        </select>
         <input
           type="text"
           name="productName"

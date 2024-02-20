@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Slide } from 'react-slideshow-image';
 import 'react-slideshow-image/dist/styles.css';
+import axios from 'axios'; // Import Axios
 
 const ProductStatus = () => {
   const [products, setProducts] = useState([]);
@@ -11,10 +12,8 @@ const ProductStatus = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('https://ecommerce-backend-fm0r.onrender.com/product/');
-      const data = await response.json();
-      setProducts(data.data);
-    //   console.log(data);
+      const response = await axios.get('https://ecommerce-backend-fm0r.onrender.com/product/');
+      setProducts(response.data.data);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
@@ -24,15 +23,16 @@ const ProductStatus = () => {
     try {
       const token = sessionStorage.getItem('adminToken');
       const updatedStatus = currentStatus === 'active' ? 'inactive' : 'active';
-      const response = await fetch(`https://ecommerce-backend-fm0r.onrender.com/product/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ productStatus: updatedStatus }),
-      });
-      if (response.ok) {
+      const response = await axios.patch(`https://ecommerce-backend-fm0r.onrender.com/product/${id}`, 
+        { productStatus: updatedStatus },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      if (response.status === 200) {
         // If PATCH request is successful, update the local state
         const updatedProducts = products.map(product => {
           if (product._id === id) {
@@ -69,12 +69,10 @@ const ProductStatus = () => {
               <div>
                 {product.discount && (
                   <p className="text-gray-500 line-through">${product.price}</p>
-                  
                 )}
                 <p className="text-sm text-lime-600 font-semibold">Discount: <span className='font-bold'>{product.discount}%</span></p>
                 <p className="text-green-600 font-semibold">${product.sellPrice}</p>
               </div>
-              {/* <p className="text-sm text-gray-600">Discount: {product.discount} %</p> */}
               <p className="text-sm text-gray-600">Stock: {product.stock}</p>
             </div>
             <p className={`text-xl font-semibold ${product.productStatus === 'active' ? 'text-green-800' : 'text-red-800'}`}>

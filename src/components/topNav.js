@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./NavBar";
 import { LoginButton, LogoutButton } from "./admin/reuse";
 
@@ -13,10 +13,13 @@ export default function TopNav() {
   //   setIsLoggedIn(true);
   // };
 
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     sessionStorage.removeItem("adminToken");
     sessionStorage.removeItem("adminUsername");
+    navigate('/');
   };
 
   return (

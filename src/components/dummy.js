@@ -1,94 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const UpdateCategoryForm = () => {
-  const [categories, setCategories] = useState([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState('');
-  const [categoryName, setCategoryName] = useState('');
-  const [categoryStatus, setCategoryStatus] = useState('');
-  const [image, setImage] = useState(null);
+const Sidebar = () => {
+  const [isOpen, setIsOpen] = useState(true);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/category');
-      const data = await response.json();
-      setCategories(data.data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append('categoryName', categoryName);
-      formData.append('categoryStatus', categoryStatus);
-      formData.append('image', image);
-
-      // Make a PUT request to update the category with selectedCategoryId
-      const response = await fetch(`http://localhost:5000/category/${selectedCategoryId}`, {
-        method: 'PUT',
-        body: formData,
-      });
-      const data = await response.json();
-      console.log(data); // Handle response data as needed
-    } catch (err) {
-      console.error('Error updating category:', err);
-    }
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
   };
 
   return (
-    <div>
-      <h2>Update Category</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="categorySelect">Select Category:</label>
-          <select id="categorySelect" value={selectedCategoryId} onChange={(e) => setSelectedCategoryId(e.target.value)}>
-            <option value="">Select a category</option>
-            {categories.map(category => (
-              <option key={category._id} value={category._id}>{category.categoryName}</option>
-            ))}
-          </select>
-        </div>
-        {selectedCategoryId && (
-          <>
-            <div>
-              <label htmlFor="categoryName">Category Name:</label>
-              <input
-                type="text"
-                id="categoryName"
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="categoryStatus">Category Status:</label>
-              <input
-                type="text"
-                id="categoryStatus"
-                value={categoryStatus}
-                onChange={(e) => setCategoryStatus(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="file">Choose File:</label>
-              <input
-                type="file"
-                id="image"
-                accept="image/*"
-                onChange={(e) => setImage(e.target.files[0])}
-              />
-            </div>
-            <button type="submit">Update Category</button>
-          </>
-        )}
-      </form>
+    <div className={`bg-gray-800 w-64 ${isOpen ? '' : 'hidden md:block'}`}>
+      <div className="text-white text-lg font-semibold p-4">
+        Sidebar
+        <button onClick={toggleSidebar} className="float-right p-2 focus:outline-none md:hidden">
+          {isOpen ? 'Hide' : 'Show'}
+        </button>
+      </div>
+      <ul className="text-white">
+        <li className="p-4">
+          <Link to="/">Home</Link>
+        </li>
+        <li className="p-4">
+          <Link to="/categories">Categories</Link>
+        </li>
+        <li className="p-4">
+          <Link to="/subcategories">Subcategories</Link>
+        </li>
+        <li className="p-4">
+          <Link to="/products">Products</Link>
+        </li>
+      </ul>
     </div>
   );
 };
 
-export default UpdateCategoryForm;
+export default Sidebar;

@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { TailSpin } from 'react-loader-spinner';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { TailSpin } from "react-loader-spinner";
 
 const SubCategoryUpload = () => {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [categoryName, setCategoryName] = useState('');
-  const [subCategoryName, setSubCategoryName] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [categoryName, setCategoryName] = useState("");
+  const [subCategoryName, setSubCategoryName] = useState("");
+  // const [selectedCategory, setSelectedCategory] = useState("");
+  const [categoryNames, setCategoryNames] = useState([]);
 
   const navigate = useNavigate();
 
@@ -30,41 +32,63 @@ const SubCategoryUpload = () => {
 
   const handleUpload = async () => {
     if (!image) {
-      setErrorMessage('Please select an image');
+      setErrorMessage("Please select an image");
       return;
     }
 
     setUploading(true);
     const formData = new FormData();
-    formData.append('image', image);
-    formData.append('categoryName', categoryName);
-    formData.append('subCategoryName', subCategoryName);
+    formData.append("image", image);
+    formData.append("categoryName", categoryName);
+    formData.append("subCategoryName", subCategoryName);
 
     try {
-      const token = sessionStorage.getItem('adminToken'); // Retrieve token from sessionStorage
+      const token = sessionStorage.getItem("adminToken"); // Retrieve token from sessionStorage
 
-      const response = await axios.post('https://ecommerce-backend-fm0r.onrender.com/subcategory/uploadImage', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}` // Attach token to the request
+      const response = await axios.post(
+        "https://ecommerce-backend-fm0r.onrender.com/subcategory/uploadImage",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`, // Attach token to the request
+          },
         }
-      });
+      );
 
       console.log(response.data);
-      toast.success('Image uploaded successfully');
+      toast.success("Image uploaded successfully");
       // Handle successful upload, e.g., show success message or redirect
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setErrorMessage('Error uploading image. Please try again later.');
-      toast.error('Error uploading image. Please try again later.');
+      console.error("Error uploading image:", error);
+      setErrorMessage("Error uploading image. Please try again later.");
+      toast.error("Error uploading image. Please try again later.");
     } finally {
       setUploading(false);
     }
   };
 
+  useEffect(() => {
+    fetchCategoryNames();
+    // eslint-disable-next-line no-use-before-define
+  }, []);
+
+  const fetchCategoryNames = async () => {
+    try {
+      const response = await fetch(
+        "https://ecommerce-backend-fm0r.onrender.com/category/"
+      );
+      const data = await response.json();
+
+      setCategoryNames(data.data);
+    } catch (error) {
+      console.error("Error fetching category names:", error);
+    }
+  };
+
   const navigateToImagesPage = () => {
     // Navigate to the page where you can view images
-    navigate('/subcategories');
+    navigate("/subcategories");
   };
 
   return (
@@ -76,13 +100,19 @@ const SubCategoryUpload = () => {
         onChange={handleImageChange}
         className="mb-4"
       />
-      <input
-        type="text"
+      <select
         value={categoryName}
         onChange={handleCategoryNameChange}
-        placeholder="Category Name"
         className="mb-4 p-2 border border-gray-300 rounded"
-      />
+        required
+      >
+        <option value="">Select a category</option>
+        {categoryNames.map((category) => (
+          <option key={category._id} value={category.categoryName}>
+            {category.categoryName}
+          </option>
+        ))}
+      </select>
       <input
         type="text"
         value={subCategoryName}
@@ -93,14 +123,12 @@ const SubCategoryUpload = () => {
       {preview && (
         <img src={preview} alt="Preview" className="mb-4 max-w-full" />
       )}
-      {errorMessage && (
-        <p className="text-red-500 mb-4">{errorMessage}</p>
-      )}
+      {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
       <button
         onClick={handleUpload}
         disabled={uploading}
         className={`w-full bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-          uploading && 'opacity-50 cursor-not-allowed'
+          uploading && "opacity-50 cursor-not-allowed"
         }`}
       >
         {uploading ? (
@@ -108,7 +136,7 @@ const SubCategoryUpload = () => {
             <TailSpin color="#FFFFFF" height={20} width={20} />
           </div>
         ) : (
-          'Upload Image'
+          "Upload Image"
         )}
       </button>
       <button

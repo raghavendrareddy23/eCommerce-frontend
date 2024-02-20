@@ -14,17 +14,19 @@ import CreateProduct from "./components/Products/createProduct";
 import ProductStatus from "./components/Products/productStatus";
 import ProductUpdate from "./components/Products/productUpdate";
 // import UpdateCategoryForm from "./components/dummy";
+// import Navbar from "./components/NavBar";
 
 function App() {
   return (
     <Router>
       <div>
-        {/* <Navbar/> */}
+        
         <TopNav />
+        {/* <Navbar/> */}
         <div className="flex-grow bg-gray-200">
           <Routes>
-            <Route path="/" exact element={<Home />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/" exact element={<AdminLogin />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/create" element={<ImageUpload />} />
             <Route path="/categories" element={<CategoryStatus />} />
             <Route path="/category-update" element={<CategoryUpdate />} />

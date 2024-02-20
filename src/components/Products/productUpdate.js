@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-// import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TailSpin, ThreeDots } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import { Slide } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
+import axios from 'axios';
 
 const ProductUpdate = () => {
   const [products, setProducts] = useState([]);
@@ -14,6 +14,7 @@ const ProductUpdate = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [subCategories, setSubCategories] = useState([]);
   const subCategoryNameRef = useRef(null);
   const productNameRef = useRef(null);
   const productDescriptionRef = useRef(null);
@@ -21,9 +22,6 @@ const ProductUpdate = () => {
   const priceRef = useRef(null);
   const sellPriceRef = useRef(null);
   const stockRef = useRef(null);
-
-
-  //   const { id } = useParams(); // Correct syntax: { id }
 
   const navigate = useNavigate();
 
@@ -33,12 +31,17 @@ const ProductUpdate = () => {
 
   const fetchSubcategories = async () => {
     try {
-      const response = await fetch(
-        "https://ecommerce-backend-fm0r.onrender.com/product/"
-      );
-      const data = await response.json();
+      const response = await axios.get("https://ecommerce-backend-fm0r.onrender.com/product/");
+      const data = response.data;
       setProducts(data.data);
       setLoading(false);
+      const uniqueSubCategories = [
+        ...new Set(
+          data.data.map((product) => product.subCategoryId.subCategoryName)
+        ),
+      ];
+      // Set the subCategories state
+      setSubCategories(uniqueSubCategories);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
     }
@@ -53,10 +56,9 @@ const ProductUpdate = () => {
     try {
       const token = sessionStorage.getItem("adminToken");
       setDeleteLoading(true); // Set delete loading to true
-      const response = await fetch(
+      const response = await axios.delete(
         `https://ecommerce-backend-fm0r.onrender.com/product/${id}`,
         {
-          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`, // Attach token to the request
           },
@@ -83,7 +85,10 @@ const ProductUpdate = () => {
     setUpdateLoading(true);
 
     const formData = new FormData();
-    formData.append("images", e.target.elements.images.files[0] || selectedProduct.imageGallery);
+    formData.append(
+      "images",
+      e.target.elements.images.files[0] || selectedProduct.imageGallery
+    );
     formData.append(
       "subCategoryName",
       subCategoryNameRef.current.value || selectedProduct.subCategoryName
@@ -94,21 +99,14 @@ const ProductUpdate = () => {
     );
     formData.append(
       "productDescription",
-      productDescriptionRef.current.value ||
-        selectedProduct.productDescription
+      productDescriptionRef.current.value || selectedProduct.productDescription
     );
-    formData.append(
-      "price",
-      priceRef.current.value || selectedProduct.price
-    );
+    formData.append("price", priceRef.current.value || selectedProduct.price);
     formData.append(
       "sellPrice",
       sellPriceRef.current.value || selectedProduct.sellPrice
     );
-    formData.append(
-      "stock",
-      stockRef.current.value || selectedProduct.stock
-    );
+    formData.append("stock", stockRef.current.value || selectedProduct.stock);
     formData.append(
       "productStatus",
       productStatusRef.current.value || selectedProduct.productStatus
@@ -116,13 +114,11 @@ const ProductUpdate = () => {
 
     try {
       const token = sessionStorage.getItem("adminToken");
-      const response = await fetch(
+      const response = await axios.put(
         `https://ecommerce-backend-fm0r.onrender.com/product/${selectedProduct._id}`,
+        formData,
         {
-          method: "PUT",
-          body: formData,
           headers: {
-            // "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -132,12 +128,12 @@ const ProductUpdate = () => {
       }
       setShowUpdateModal(false);
       toast.success("Subcategory updated successfully");
-      fetchSubcategories(); 
+      fetchSubcategories();
     } catch (error) {
       console.error(error);
       toast.error("Failed to update subcategory");
     } finally {
-      setUpdateLoading(false); 
+      setUpdateLoading(false);
     }
   };
 
@@ -250,18 +246,25 @@ const ProductUpdate = () => {
                   name="images"
                   accept="image/*"
                   multiple
-                //   defaultValue={selectedProduct.imageGallery}
+                  //   defaultValue={selectedProduct.imageGallery}
                   className="mb-4"
                 />
-                <input
-                  type="text"
-                  placeholder="SubCategory Name"
-                  className="mb-4 p-2 border border-gray-300 rounded"
+                <select
+                  id="subcategory"
+                  className="p-2 border border-gray-300 rounded"
                   ref={subCategoryNameRef}
-                  required
-                  defaultValue={selectedProduct.subCategoryName}
+                  // defaultValue={selectedProduct?.subCategoryName}
                   name="subCategoryName"
-                />
+                  required
+                >
+                  <option value="">Select Subcategory</option>
+                  {subCategories.map((subcategory, index) => (
+                    <option key={index} value={subcategory}>
+                      {subcategory}
+                    </option>
+                  ))}
+                </select>
+
                 <input
                   type="text"
                   placeholder="Product Name"

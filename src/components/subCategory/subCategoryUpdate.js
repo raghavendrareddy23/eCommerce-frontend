@@ -11,6 +11,8 @@ const SubCategoryUpdate = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [categoryNames, setCategoryNames] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const categoryNameRef = useRef(null);
   const subCategoryNameRef = useRef(null);
   const subCategoryStatusRef = useRef(null);
@@ -19,6 +21,8 @@ const SubCategoryUpdate = () => {
 
   useEffect(() => {
     fetchSubcategories();
+    fetchCategoryNames(); 
+  // eslint-disable-next-line no-use-before-define
   }, []);
 
   const fetchSubcategories = async () => {
@@ -31,6 +35,19 @@ const SubCategoryUpdate = () => {
       setLoading(false);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
+    }
+  };
+
+  const fetchCategoryNames = async () => {
+    try {
+      const response = await fetch(
+        "https://ecommerce-backend-fm0r.onrender.com/category/"
+      );
+      const data = await response.json();
+
+      setCategoryNames(data.data);
+    } catch (error) {
+      console.error("Error fetching category names:", error);
     }
   };
 
@@ -73,14 +90,13 @@ const SubCategoryUpdate = () => {
     setUpdateLoading(true);
 
     const formData = new FormData();
-      formData.append("image", e.target.elements.image.files[0]); 
-      formData.append("categoryName", categoryNameRef.current.value);
-      formData.append("subCategoryName", subCategoryNameRef.current.value);
-      formData.append("subCategoryStatus", subCategoryStatusRef.current.value);
+    formData.append("image", e.target.elements.image.files[0]);
+    formData.append("categoryName", categoryNameRef.current.value);
+    formData.append("subCategoryName", subCategoryNameRef.current.value);
+    formData.append("subCategoryStatus", subCategoryStatusRef.current.value);
 
     try {
       const token = sessionStorage.getItem("adminToken");
-      
 
       const response = await fetch(
         `https://ecommerce-backend-fm0r.onrender.com/subcategory/${selectedSubcategory._id}`,
@@ -109,6 +125,10 @@ const SubCategoryUpdate = () => {
   const navigateToImagesPage = () => {
     // Navigate to the page where you can view images
     navigate("subcategory/create");
+  };
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
   };
 
   return (
@@ -186,13 +206,18 @@ const SubCategoryUpdate = () => {
                   ref={subCategoryStatusRef}
                   className="mb-4 p-2 border border-gray-300 rounded"
                 />
-                <input
-                  type="text"
-                  placeholder="Category Name"
-                  required
+                <select
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
                   ref={categoryNameRef}
-                  className="mb-4 p-2 border border-gray-300 rounded"
-                />
+                >
+                  <option value="">Select a category</option>
+                  {categoryNames.map((category) => (
+                    <option key={category._id} value={category.categoryName}>
+                      {category.categoryName}
+                    </option>
+                  ))}
+                </select>
                 <div className="mt-4 flex justify-end">
                   <button
                     type="button"

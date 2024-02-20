@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TailSpin } from 'react-loader-spinner';
-import { toast, ToastContainer } from 'react-toastify'; // Import toast components
-import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -20,28 +21,23 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('https://ecommerce-backend-fm0r.onrender.com/user/adminLogin', {
-        method: 'POST',
+      const response = await axios.post('https://ecommerce-backend-fm0r.onrender.com/user/adminLogin', formData, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
       });
-      if (response.ok) {
-        const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
         sessionStorage.setItem('adminToken', data.token);
         sessionStorage.setItem('adminUsername', JSON.stringify(data.username));
-        toast.success('Admin logged in successfully!'); // Display success toast
-        // window.location.reload();
-        navigate("/");
-        window.location.reload();
+        toast.success('Admin logged in successfully!');
+        navigate("/home");
       } else {
-        const data = await response.json();
-        toast.error(data.message || 'Failed to login admin'); // Display error toast
+        toast.error(response.data.message || 'Failed to login admin');
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('An error occurred. Please try again later.'); // Display error toast
+      toast.error('An error occurred. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -61,7 +57,7 @@ const AdminLogin = () => {
           {loading ? <TailSpin color="#FFFFFF" height={20} width={20} /> : 'Login'}
         </button>
       </form>
-      <ToastContainer /> {/* Toast container */}
+      <ToastContainer />
     </div>
   );
 };
