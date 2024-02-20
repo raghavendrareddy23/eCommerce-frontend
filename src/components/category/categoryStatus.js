@@ -62,7 +62,7 @@ const CategoryStatus = () => {
     <div>
       <div className="flex flex-wrap justify-center">
         {loading ? (
-          <ThreeDots color="green" height={30} width={30} />
+          <ThreeDots color="green" height={50} width={50} />
         ) : (
           imageData.map((image) => (
             <div key={image._id} className="max-w-xs mx-4 my-4">

@@ -40,7 +40,7 @@ const Navbar = () => {
         <nav className="p-2">
           <ul>
             <li className="px-4 py-2 hover:bg-gray-700">
-              <Link to="/" onClick={closeMenu}>Home</Link>
+              <Link to="/home" onClick={closeMenu}>Home</Link>
             </li>
             <li className="px-4 py-2 hover:bg-gray-700" onClick={() => toggleDropdown('categories')}>
               Category

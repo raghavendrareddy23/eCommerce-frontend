@@ -122,7 +122,7 @@ const CategoryUpdate = () => {
       </button>
       <div className="flex flex-wrap justify-center">
         {loading ? (
-          <ThreeDots color="#FFFFFF" height={20} width={20} />
+          <ThreeDots color="#0c6602" height={50} width={50} />
         ) : (
           imageData.map((image) => (
             <div key={image._id} className="max-w-xs mx-4 my-4">

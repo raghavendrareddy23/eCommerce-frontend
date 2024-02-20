@@ -152,7 +152,7 @@ const ProductUpdate = () => {
       </button>
       <div className="flex flex-wrap justify-center p-5">
         {loading ? (
-          <ThreeDots color="#FFFFFF" height={20} width={20} />
+          <ThreeDots color="#0c6602" height={50} width={50} />
         ) : (
           products.map((product, index) => (
             <div

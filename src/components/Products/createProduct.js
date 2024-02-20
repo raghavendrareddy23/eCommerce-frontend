@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios"; // Import Axios
+import { TailSpin } from "react-loader-spinner";
+import axios from "axios";
 
 const CreateProduct = () => {
   const [formData, setFormData] = useState({
@@ -15,10 +16,11 @@ const CreateProduct = () => {
   });
 
   const [subCategories, setSubCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchSubcategories();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSubcategories = async () => {
@@ -33,7 +35,6 @@ const CreateProduct = () => {
         ),
       ];
       setSubCategories(uniqueSubCategories);
-      console.log(subCategories);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
     }
@@ -54,7 +55,9 @@ const CreateProduct = () => {
     const token = sessionStorage.getItem("adminToken");
 
     try {
-      const formData = new FormData(e.target); // Create FormData object
+      setLoading(true);
+
+      const formData = new FormData(e.target);
 
       const response = await axios.post(
         "https://ecommerce-backend-fm0r.onrender.com/product/uploadImage",
@@ -62,14 +65,13 @@ const CreateProduct = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data", // Set content type to multipart/form-data
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       if (response.status === 200) {
         toast.success("Product created successfully");
-        // Reset form after successful submission
         setFormData({
           subCategoryName: "",
           productName: "",
@@ -85,6 +87,8 @@ const CreateProduct = () => {
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Failed to create product");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -162,9 +166,14 @@ const CreateProduct = () => {
         />
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 flex items-center justify-center"
+          disabled={loading} // Disable the button when loading
         >
-          Create Product
+          {loading ? (
+            <TailSpin color="#ffffff" height={20} width={20} />
+          ) : (
+            "Create Product"
+          )}
         </button>
       </form>
       <ToastContainer />
