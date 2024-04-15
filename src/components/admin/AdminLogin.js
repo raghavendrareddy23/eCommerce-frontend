@@ -21,7 +21,7 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('https://ecommerce-backend-fm0r.onrender.com/user/adminLogin', formData, {
+      const response = await axios.post('https://ecommerce-backend-fm0r.onrender.com/user/login', formData, {
         headers: {
           'Content-Type': 'application/json',
         },
